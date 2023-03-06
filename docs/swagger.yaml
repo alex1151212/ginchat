@@ -1,0 +1,111 @@
+info:
+  contact: {}
+paths:
+  /index:
+    get:
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      tags:
+      - 首頁
+  /user/createUser:
+    get:
+      parameters:
+      - description: 使用者名稱
+        in: query
+        name: name
+        type: string
+      - description: 使用者密碼
+        in: query
+        name: password
+        type: string
+      - description: 使用者確認密碼
+        in: query
+        name: repassword
+        type: string
+      responses:
+        "200":
+          description: code","message"}
+          schema:
+            type: string
+      summary: 新增用戶
+      tags:
+      - 用戶
+  /user/deleteUser:
+    get:
+      parameters:
+      - description: 使用者ID
+        in: query
+        name: id
+        type: string
+      responses:
+        "200":
+          description: code","message"}
+          schema:
+            type: string
+      summary: 刪除用戶
+      tags:
+      - 用戶
+  /user/findUserByNameAndPwd:
+    post:
+      parameters:
+      - description: 使用者名稱
+        in: query
+        name: name
+        type: string
+      - description: 使用者密碼
+        in: query
+        name: password
+        type: string
+      responses:
+        "200":
+          description: code","message"}
+          schema:
+            type: string
+      summary: 所有用戶
+      tags:
+      - 用戶
+  /user/getUserList:
+    get:
+      responses:
+        "200":
+          description: code","message"}
+          schema:
+            type: string
+      summary: 所有用戶
+      tags:
+      - 用戶
+  /user/updateUser:
+    post:
+      parameters:
+      - description: 使用者ID
+        in: formData
+        name: id
+        type: string
+      - description: 使用者名稱
+        in: formData
+        name: name
+        type: string
+      - description: 使用者密碼
+        in: formData
+        name: password
+        type: string
+      - description: 電話號碼
+        in: formData
+        name: phone
+        type: string
+      - description: 電子信箱
+        in: formData
+        name: email
+        type: string
+      responses:
+        "200":
+          description: code","message"}
+          schema:
+            type: string
+      summary: 編輯用戶
+      tags:
+      - 用戶
+swagger: "2.0"

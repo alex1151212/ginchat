@@ -6,6 +6,7 @@ import (
 )
 
 func main() {
+	utils.InitRedis()
 	utils.InitConfig()
 	utils.InitMySQL()
 	r := router.Router()
