@@ -17,13 +17,13 @@ type Message struct {
 	gorm.Model
 	FromId   int64  //發送者
 	TargetId int64  //接收者
-	Type     int    //發送類型:群組聊天、私訊聊天、廣播
-	Media    int    //訊息類型:文字、圖片、音訊
+	Type     int    //發送類型: 1.私訊聊天 2.群組聊天 3.廣播
+	Media    int    //訊息類型: 1.文字 2.表情包 3.圖片 4.音訊
 	Content  string //訊息內容
 	Pic      string
 	Url      string
 	Desc     string
-	Amount   int
+	Amount   int //其他數字統計
 }
 
 func (table *Message) TableName() string {
@@ -45,7 +45,6 @@ var rwLocker sync.RWMutex
 func Chat(writer http.ResponseWriter, request *http.Request) {
 	// 1.獲取參數並進行token驗證
 	// token := query.Get("token")
-
 	query := request.URL.Query()
 	id := query.Get("userId")
 	userId, _ := strconv.ParseInt(id, 10, 64)
@@ -65,8 +64,7 @@ func Chat(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	// 2.token驗證
-	// 獲取conn
+	// 2.獲取conn
 	node := &Node{
 		Conn:      conn,
 		DataQueue: make(chan []byte, 50),
@@ -81,7 +79,7 @@ func Chat(writer http.ResponseWriter, request *http.Request) {
 
 	// 5.完成發送邏輯
 	go sendProc(node)
-	// 6.完成發接收邏輯
+	// 6.完成接收邏輯
 	go recvProc(node)
 
 	sendMsg(userId, []byte("歡迎進入聊天室!"))
@@ -108,7 +106,7 @@ func recvProc(node *Node) {
 			return
 		}
 		broadMsg(data)
-		fmt.Println(data)
+		fmt.Println("[ws] <<<<< ", data)
 	}
 }
 
@@ -134,14 +132,12 @@ func udpSendProc() {
 		fmt.Println(err)
 	}
 	for {
-		for {
-			select {
-			case data := <-udpsendChan:
-				_, err := con.Write(data)
-				if err != nil {
-					fmt.Println(err)
-					return
-				}
+		select {
+		case data := <-udpsendChan:
+			_, err := con.Write(data)
+			if err != nil {
+				fmt.Println(err)
+				return
 			}
 		}
 	}
