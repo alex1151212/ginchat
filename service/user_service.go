@@ -213,3 +213,11 @@ func MsgHandler(ws *websocket.Conn, c *gin.Context) {
 func SendUserMsg(c *gin.Context) {
 	models.Chat(c.Writer, c.Request)
 }
+
+func SearchFriends(c *gin.Context) {
+	userId, _ := strconv.Atoi(c.PostForm("userId"))
+	users := models.SearchFriend(uint(userId))
+
+	fmt.Println(len(users))
+	utils.RespOKList(c.Writer, users, len(users))
+}
