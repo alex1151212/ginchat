@@ -33,3 +33,48 @@ func SearchFriend(userId uint) []UserBasic {
 	utils.DB.Where("id in ?", objIds).Find(&users)
 	return users
 }
+
+func AddFriend(userId uint, targetId uint) (int, string) {
+	user := UserBasic{}
+	if targetId != 0 {
+		user = FindUserByID(targetId)
+		if user.Salt != "" {
+			if userId == user.ID {
+				return -1, "無法新增自己好友"
+			}
+			contact0 := Contact{}
+			utils.DB.Where("owner_id = ? and target_id = ? and type = 1 ", userId, targetId).Find(&contact0)
+			if contact0.ID != 0 {
+				return -1, "無法重複添加好友"
+			}
+
+			tx := utils.DB.Begin()
+			// DB事務錯誤Rollback
+			defer func() {
+				if r := recover(); r != nil {
+					tx.Rollback()
+				}
+			}()
+			contact := Contact{}
+			contact.OwnerId = userId
+			contact.TargetId = targetId
+			contact.Type = 1
+			if err := utils.DB.Create(&contact).Error; err != nil {
+				tx.Rollback()
+				return -1, "新增好友失敗"
+			}
+			contact1 := Contact{}
+			contact1.OwnerId = targetId
+			contact1.TargetId = userId
+			contact1.Type = 1
+			if err := utils.DB.Create(&contact1).Error; err != nil {
+				tx.Rollback()
+				return -1, "新增好友失敗"
+			}
+			tx.Commit()
+			return 0, "新增好友成功"
+		}
+		return -1, "查無此用戶"
+	}
+	return -1, "好友名稱不能為空"
+}

@@ -446,9 +446,9 @@
                                 } else if (data.Media === 2) {
                                     item.memo = data.Url
                                 } else if (data.Media === 3) {
-                                    item.memo = "[语音]"
+                                    item.memo = "[語音]"
                                 } else if (data.Media === 4) {
-                                    item.memo = "[图片]"
+                                    item.memo = "[圖片]"
                                 }
                             }
                         })
@@ -505,7 +505,7 @@
                 addfriend: function () {
                     //console.log("addfriend....")
                     var that = this;
-                    mui.prompt('', '请输入好友名称', '加好友', ['取消', '确认'], function (e) {
+                    mui.prompt('', '請輸入好友名稱', '加好友', ['取消', '確認'], function (e) {
                         if (e.index == 1) {
                             //判断数字
                             //if (isNaN(e.value) || e.value <= 0) {
@@ -527,7 +527,7 @@
                         this.setTimeFlag()
                         //console.log("_addfriend....")
                         var that = this
-                        post("contact/addfriend", { targetName: dstobj, userId: userId() }, function (res) {
+                        post("contact/addfriend", { targetId: dstobj, userId: userId() }, function (res) {
                             if (res.Code == 0) {
                                 mui.toast("添加成功");
                                 that.loadfriends();

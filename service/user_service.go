@@ -221,3 +221,29 @@ func SearchFriends(c *gin.Context) {
 	fmt.Println(len(users))
 	utils.RespOKList(c.Writer, users, len(users))
 }
+
+func AddFriend(c *gin.Context) {
+	userId, _ := strconv.Atoi(c.PostForm("userId"))
+	targetId, _ := strconv.Atoi(c.PostForm("targetId"))
+	code, msg := models.AddFriend(uint(userId), uint(targetId))
+	if code == 0 {
+		utils.RespOKList(c.Writer, code, msg)
+	} else {
+		utils.RespFail(c.Writer, msg)
+	}
+
+}
+
+func CreateCommunity(c *gin.Context) {
+	ownerId, _ := strconv.Atoi(c.PostForm("ownerId"))
+	name := c.PostForm("name")
+	community := models.Community{}
+	community.OwnerId = uint(ownerId)
+	community.Name = name
+	code, msg := models.CreateCommunity(community)
+	if code == 0 {
+		utils.RespOKList(c.Writer, code, msg)
+	} else {
+		utils.RespFail(c.Writer, msg)
+	}
+}
