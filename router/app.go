@@ -21,6 +21,7 @@ func Router() *gin.Engine {
 	r.Static("/asset", "asset/")
 	r.LoadHTMLGlob("views/**/*")
 
+	//前端
 	r.GET("/", service.GetIndex)
 	r.GET("/index", service.GetIndex)
 	r.GET("/toRegister", service.ToRegister)
@@ -34,6 +35,7 @@ func Router() *gin.Engine {
 	r.DELETE("/user/deleteUser", service.DeleteUser)
 	r.POST("/user/updateUser", service.UpdateUser)
 	r.POST("/user/findUserByNameAndPwd", service.FindUserByNameAndPwd)
+	r.POST("/user/find", service.FindByID)
 
 	//發送訊息
 	r.GET("/user/sendMsg", service.SendMsg)
@@ -47,5 +49,8 @@ func Router() *gin.Engine {
 
 	//創建群組
 	r.POST("/contact/createCommunity", service.CreateCommunity)
+	//群組列表
+	r.POST("/contact/loadcommunity", service.LoadCommunity)
+	r.POST("/contact/joinGroup", service.JoinGroups)
 	return r
 }

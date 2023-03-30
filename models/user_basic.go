@@ -83,3 +83,9 @@ func FindUserByID(id uint) UserBasic {
 	utils.DB.Where("id = ?", id).First(&user)
 	return user
 }
+
+func FindByID(id uint) UserBasic {
+	user := UserBasic{}
+	utils.DB.Where("id = ?", id).First(&user)
+	return user
+}

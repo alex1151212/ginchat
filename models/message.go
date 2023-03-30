@@ -3,12 +3,14 @@ package models
 import (
 	"encoding/json"
 	"fmt"
+	"ginchat/utils"
 	"net"
 	"net/http"
 	"strconv"
 	"sync"
 
 	"github.com/gorilla/websocket"
+	"github.com/spf13/viper"
 	"gopkg.in/fatih/set.v0"
 	"gorm.io/gorm"
 )
@@ -129,7 +131,7 @@ func init() {
 func udpSendProc() {
 	con, err := net.DialUDP("udp", nil, &net.UDPAddr{
 		IP:   net.IPv4(192, 168, 0, 255),
-		Port: 3000,
+		Port: viper.GetInt("port.udp"),
 	})
 	defer con.Close()
 	if err != nil {
@@ -151,7 +153,7 @@ func udpSendProc() {
 func udpRecvProc() {
 	con, err := net.ListenUDP("udp", &net.UDPAddr{
 		IP:   net.IPv4zero,
-		Port: 3000,
+		Port: viper.GetInt("port.udp"),
 	})
 	if err != nil {
 		fmt.Println(err)
@@ -184,15 +186,25 @@ func dispatch(data []byte) {
 	case 1: //私訊
 		fmt.Println("dispatch data :", string(data))
 		sendMsg(msg.TargetId, data)
-		// case 2:sendGroupMsg() //群組聊天
+	case 2: //群組聊天
+		sendGroupMsg(msg.TargetId, data)
 		// case 3:sendAllMsg() //廣播
 		// case 4:
 
 	}
 }
 
-func sendMsg(userId int64, msg []byte) {
+func sendGroupMsg(targetId int64, msg []byte) {
+	fmt.Println("開始群組訊息發送")
+	userIds := SearchUserByGroupId(uint(targetId))
+	for _, userId := range userIds {
+		if targetId != int64(userId) {
+			sendMsg(int64(userId), msg)
+		}
+	}
+}
 
+func sendMsg(userId int64, msg []byte) {
 	fmt.Println("sendMsg >>> userID: ", userId, " msg:", string(msg))
 	rwLocker.RLock()
 	node, ok := clientMap[userId]
@@ -200,5 +212,24 @@ func sendMsg(userId int64, msg []byte) {
 	if ok {
 		node.DataQueue <- msg
 	}
+}
 
+func JoinGroup(userId uint, comId string) (int, string) {
+	contact := Contact{}
+	contact.OwnerId = userId
+	contact.Type = 2
+	community := Community{}
+
+	utils.DB.Where("id = ? or name= ? ", comId, comId).Find(&community)
+	if community.Name == "" {
+		return -1, "沒有找到此群組"
+	}
+	utils.DB.Where("owner_id =  ? and target_id = ? and  type = 2 ", userId, comId).Find(&contact)
+	if !contact.CreatedAt.IsZero() {
+		return -1, "已加過此群組"
+	} else {
+		contact.TargetId = community.ID
+		utils.DB.Create(&contact)
+		return 0, "加入群組成功"
+	}
 }

@@ -224,8 +224,8 @@ func SearchFriends(c *gin.Context) {
 
 func AddFriend(c *gin.Context) {
 	userId, _ := strconv.Atoi(c.PostForm("userId"))
-	targetId, _ := strconv.Atoi(c.PostForm("targetId"))
-	code, msg := models.AddFriend(uint(userId), uint(targetId))
+	targetName := c.PostForm("targetName")
+	code, msg := models.AddFriend(uint(userId), targetName)
 	if code == 0 {
 		utils.RespOKList(c.Writer, code, msg)
 	} else {
@@ -246,4 +246,33 @@ func CreateCommunity(c *gin.Context) {
 	} else {
 		utils.RespFail(c.Writer, msg)
 	}
+}
+func LoadCommunity(c *gin.Context) {
+	ownerId, _ := strconv.Atoi(c.PostForm("ownerId"))
+	data, msg := models.LoadCommunity(uint(ownerId))
+
+	if len(data) != 0 {
+		utils.RespList(c.Writer, 0, data, msg)
+	} else {
+		utils.RespFail(c.Writer, msg)
+	}
+}
+func JoinGroups(c *gin.Context) {
+	userId, _ := strconv.Atoi(c.PostForm("userId"))
+	comId := c.PostForm("comId")
+
+	data, msg := models.JoinGroup(uint(userId), comId)
+
+	if data == 0 {
+		utils.RespOK(c.Writer, data, msg)
+	} else {
+		utils.RespFail(c.Writer, msg)
+	}
+}
+
+func FindByID(c *gin.Context) {
+	userId, _ := strconv.Atoi(c.PostForm("userId"))
+
+	data := models.FindByID(uint(userId))
+	utils.RespOK(c.Writer, data, "ok")
 }

@@ -527,7 +527,7 @@
                         this.setTimeFlag()
                         //console.log("_addfriend....")
                         var that = this
-                        post("contact/addfriend", { targetId: dstobj, userId: userId() }, function (res) {
+                        post("contact/addfriend", { targetName: dstobj, userId: userId() }, function (res) {
                             if (res.Code == 0) {
                                 mui.toast("添加成功");
                                 that.loadfriends();
@@ -636,17 +636,17 @@
                         this.isDisable = true;
                     }, 100)
                 },
-                heartbeat() {
-                    if (this.webSocket.readyState == 1) {  //失去连接 3
-                        var msg = this.createmsgcontext();
-                        msg.Media = -1;
-                        msg.Type = 3
-                        msg.Content = "心跳";
-                        //this.showmsg(userInfo(),msg);
-                        this.webSocket.send(JSON.stringify(msg))
-                    }
+                // heartbeat() {
+                //     if (this.webSocket.readyState == 1) {  //失去连接 3
+                //         var msg = this.createmsgcontext();
+                //         msg.Media = -1;
+                //         msg.Type = 3
+                //         msg.Content = "心跳";
+                //         //this.showmsg(userInfo(),msg);
+                //         this.webSocket.send(JSON.stringify(msg))
+                //     }
 
-                }
+                // }
 
 
             },
